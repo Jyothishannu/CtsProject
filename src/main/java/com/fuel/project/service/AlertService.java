@@ -24,7 +24,7 @@ public class AlertService {
         String username = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
      
-        return userRepository.findByUsername(username).get();
+        return userRepository.findByUsername(username);
     }
  
     public List<Alert> getAllAlerts() {

@@ -6,10 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.*;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
  
 import java.io.IOException;
+import java.util.Collections;
  
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -50,23 +52,35 @@ public class JwtFilter extends OncePerRequestFilter {
                             userDetailsService.loadUserByUsername(username);
  
                     if (jwtUtil.validateToken(token, username)) {
- 
+                    	 
                         UsernamePasswordAuthenticationToken auth =
                                 new UsernamePasswordAuthenticationToken(
                                         userDetails,
                                         null,
-                                        userDetails.getAuthorities()
+                                        Collections.emptyList() // ✅ use this
                                 );
- 
+                     
+                        // 🔥 VERY IMPORTANT LINE (MISSING IN YOUR CODE)
+                        auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                     
                         SecurityContextHolder.getContext().setAuthentication(auth);
+                        System.out.println("Username from token: " + username);
+                        
+                        boolean isValid = jwtUtil.validateToken(token, username);
+                        System.out.println("Is token valid: " + isValid);
                     }
+                    
                 }
  
             } catch (Exception e) {
                 System.out.println("JWT Error: " + e.getMessage());
             }
         }
- 
+        
         chain.doFilter(request, response);
+        System.out.println("JWT Filter HIT");
+        System.out.println("Authorization Header: " + header);
+        
     }
+    
 }

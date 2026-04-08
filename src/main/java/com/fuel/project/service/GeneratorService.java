@@ -24,7 +24,7 @@ public class GeneratorService {
         String username = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
      
-        return userRepository.findByUsername(username).get();
+        return userRepository.findByUsername(username);
     }
     
     // START GENERATOR

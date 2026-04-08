@@ -27,7 +27,7 @@ public class FuelMachineService {
         String username = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
      
-        return userRepository.findByUsername(username).get();
+        return userRepository.findByUsername(username);
     }
 	
 	//start the machine(ON)

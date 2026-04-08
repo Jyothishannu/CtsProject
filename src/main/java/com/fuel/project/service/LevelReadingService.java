@@ -51,7 +51,7 @@ public class LevelReadingService {
         String username = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
      
-        return userRepository.findByUsername(username).get();
+        return userRepository.findByUsername(username);
     }
  
     public LevelReading saveReading(LevelReading reading) {

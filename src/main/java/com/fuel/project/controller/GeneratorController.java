@@ -3,9 +3,12 @@ package com.fuel.project.controller;
 import java.util.List;
  
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
  
 import com.fuel.project.entity.Generator;
+import com.fuel.project.entity.User;
+import com.fuel.project.repository.UserRepository;
 import com.fuel.project.service.GeneratorService;
 
 @CrossOrigin(origins = "http://localhost:4200")
@@ -15,6 +18,15 @@ public class GeneratorController {
  
     @Autowired
     private GeneratorService generatorService;
+    @Autowired
+    private UserRepository userRepository;
+    
+    public User getLoggedInUser() {
+        String username = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+     
+        return userRepository.findByUsername(username);
+    }
     
     @PutMapping("/start/{id}")
     public Generator start(@PathVariable Long id) {

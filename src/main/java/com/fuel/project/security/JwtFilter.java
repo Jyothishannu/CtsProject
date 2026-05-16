@@ -9,7 +9,9 @@ import org.springframework.security.core.userdetails.*;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
- 
+
+import com.fuel.project.service.TokenBlacklistService;
+
 import java.io.IOException;
 import java.util.Collections;
  
@@ -21,6 +23,8 @@ public class JwtFilter extends OncePerRequestFilter {
  
     @Autowired
     private CustomUserDetailsService userDetailsService;
+    @Autowired
+    private TokenBlacklistService blacklistService;
  
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -41,6 +45,13 @@ public class JwtFilter extends OncePerRequestFilter {
         if (header != null && header.startsWith("Bearer ")) {
  
             String token = header.substring(7);
+            
+            //check whether the token is in blacklist(logout case)
+            if(blacklistService.isBlacklist(token)) {
+            	response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            	response.getWriter().write("You are been signed out, please login again");
+            	return;
+            }
  
             try {
                 String username = jwtUtil.extractUsername(token);

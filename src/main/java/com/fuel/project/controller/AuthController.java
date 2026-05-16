@@ -4,6 +4,10 @@ import com.fuel.project.dto.*;
 import com.fuel.project.entity.User;
 import com.fuel.project.repository.UserRepository;
 import com.fuel.project.security.JwtUtil;
+import com.fuel.project.service.TokenBlacklistService;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +33,9 @@ public class AuthController {
      
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private TokenBlacklistService blacklistService;
  
     // REGISTER
     @PostMapping("/register")
@@ -60,6 +67,24 @@ public class AuthController {
         String token = jwtUtil.generateToken(request.getUsername());
      
         return new AuthResponse(token);
+    }
+    
+    //LOGOUT
+    @PostMapping("/logout")
+    public String logout(HttpServletRequest request) {
+
+        String header = request.getHeader("Authorization");
+
+        if (header != null && header.startsWith("Bearer ")) {
+
+            String token = header.substring(7);
+
+            blacklistService.tokenBlacklist(token);
+
+            return "Logged out successfully";
+        }
+
+        return "No token found";
     }
 
 }
